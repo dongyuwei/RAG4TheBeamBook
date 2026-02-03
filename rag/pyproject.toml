@@ -1,0 +1,12 @@
+[project]
+name = "rag"
+version = "0.1.0"
+description = "RAG application for the Erlang BEAM book"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic-ai>=0.0.27",
+    "sentence-transformers>=3.3.1",
+    "chromadb>=0.6.3",
+    "click>=8.1.7",
+]
