@@ -1,0 +1,2 @@
+Read ./rag-app-instructions/tasks-for-coding-agent.md and implement the required RAG app for the BEAM book.
+Note: currect foler content is forked from the original [theBeamBook](https://github.com/happi/theBeamBook)
