@@ -27,4 +27,7 @@ images/diag-*.png
 site
 .asciidoctor
 .DS_Store
+
 rag/.venv
+__pycache__
+rag/src/vector_db/

@@ -70,7 +70,7 @@ When providing your answer:
         self.agent = Agent(
             model=model,
             system_prompt=self.SYSTEM_PROMPT,
-            result_type=RAGResponse,
+            output_type=RAGResponse,
             retries=2,
         )
 
@@ -119,9 +119,9 @@ Please provide a comprehensive answer based on the retrieved context above.
             source_snippets.append(source_info)
 
         return RAGResponse(
-            answer=result.data.answer,
+            answer=result.output.answer,
             source_snippets=source_snippets,
-            confidence=result.data.confidence,
+            confidence=result.output.confidence,
         )
 
     def _build_context(self, results: List[dict]) -> str:

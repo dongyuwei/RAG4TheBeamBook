@@ -18,7 +18,7 @@ class VectorStore:
     def __init__(
         self,
         persist_directory: Path | str | None = None,
-        embedding_model: str = "all-MiniLM-L6-v2",
+        embedding_model: str = "/Users/yuweidong/.cache/huggingface/hub/models--sentence-transformers--all-MiniLM-L6-v2/snapshots/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/",
         collection_name: str = "beam_book",
     ):
         """Initialize the vector store.
@@ -71,12 +71,18 @@ class VectorStore:
         documents = []
         metadatas = []
         embeddings = []
+        seen_ids = set()
 
         for chunk in chunks:
             # Generate unique ID based on content hash
             chunk_id = self._generate_id(chunk)
 
-            # Skip if already exists
+            # Skip if already seen in this batch
+            if chunk_id in seen_ids:
+                continue
+            seen_ids.add(chunk_id)
+
+            # Skip if already exists in database
             existing = self.collection.get(ids=[chunk_id])
             if existing and existing["ids"]:
                 continue

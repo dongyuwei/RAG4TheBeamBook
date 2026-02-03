@@ -41,35 +41,18 @@ uv pip install -e ".[dev]"
 Or install directly:
 
 ```bash
-uv pip install pydantic-ai chromadb sentence-transformers click rich python-dotenv
+proxychains4 uv pip install pydantic-ai chromadb sentence-transformers click rich python-dotenv
 ```
 
 ## Configuration
 
-### API Key
-
-The RAG agent uses OpenAI's GPT-4o-mini by default. You need to set your OpenAI API key:
-
-```bash
-export OPENAI_API_KEY="your-api-key-here"
-```
-
-Or you can pass it directly when running commands:
-
-```bash
-beam-rag ask "What is BEAM?" --api-key="your-api-key"
-```
-
-### Alternative Models
+### Use Anthropic Claude Models
 
 You can use other models supported by Pydantic AI:
 
 ```bash
 # Use Anthropic Claude
-beam-rag ask "What is BEAM?" --model="anthropic:claude-3-5-sonnet-latest"
-
-# Use a different OpenAI model
-beam-rag ask "What is BEAM?" --model="openai:gpt-4o"
+proxychains4 uv run beam-rag ask "What is BEAM?" --model="anthropic:claude-sonnet-4-5"
 ```
 
 ## Usage
@@ -79,7 +62,10 @@ beam-rag ask "What is BEAM?" --model="openai:gpt-4o"
 First, you need to index all the BEAM book documents:
 
 ```bash
-beam-rag index
+set -x HF_ENDPOINT https://hf-mirror.com # for fish shell
+hf download sentence-transformers/all-MiniLM-L6-v2 ## needed for user in China, otherwise it keeps timeout to download the embeding model.
+
+uv run beam-rag index
 ```
 
 This will:
@@ -91,7 +77,7 @@ This will:
 You can specify custom paths:
 
 ```bash
-beam-rag index --book-path /path/to/theBeamBook --vector-db /path/to/vector_db
+uv run beam-rag index --book-path /path/to/theBeamBook --vector-db /path/to/vector_db
 ```
 
 ### 2. Ask Questions
@@ -99,10 +85,10 @@ beam-rag index --book-path /path/to/theBeamBook --vector-db /path/to/vector_db
 Once indexed, you can ask questions about the BEAM:
 
 ```bash
-beam-rag ask "What is the BEAM virtual machine?"
-beam-rag ask "How does Erlang process scheduling work?"
-beam-rag ask "Explain the Erlang garbage collector"
-beam-rag ask "What are the main components of ERTS?"
+uv run beam-rag ask "What is the BEAM virtual machine?"
+uv run beam-rag ask "How does Erlang process scheduling work?"
+uv run beam-rag ask "Explain the Erlang garbage collector"
+uv run beam-rag ask "What are the main components of ERTS?"
 ```
 
 The agent will:
@@ -115,7 +101,7 @@ The agent will:
 View statistics about the indexed documents:
 
 ```bash
-beam-rag stats
+uv run beam-rag stats
 ```
 
 ### 4. Clear the Index
@@ -123,7 +109,7 @@ beam-rag stats
 To remove all indexed documents:
 
 ```bash
-beam-rag clear
+uv run beam-rag clear
 ```
 
 ## Architecture
