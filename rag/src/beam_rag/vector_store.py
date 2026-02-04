@@ -2,14 +2,38 @@
 
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import List, Dict, Any
 
 import chromadb
 from chromadb.config import Settings
+from huggingface_hub import snapshot_download, hf_hub_download
 from sentence_transformers import SentenceTransformer
 
 from beam_rag.document_processor import DocumentChunk
+
+
+def get_cached_model_path(model_name: str) -> str | None:
+    """Get the local path for a cached model, or None if not cached.
+
+    Args:
+        model_name: The HuggingFace model name (e.g., 'sentence-transformers/all-MiniLM-L6-v2')
+
+    Returns:
+        Path to the cached model directory, or None if not found
+    """
+    try:
+        # Try to get the model from cache without downloading
+        local_path = snapshot_download(
+            repo_id=model_name,
+            local_files_only=True,
+            resume_download=False,
+        )
+        return local_path
+    except Exception:
+        # Model not in cache
+        return None
 
 
 class VectorStore:
@@ -18,7 +42,7 @@ class VectorStore:
     def __init__(
         self,
         persist_directory: Path | str | None = None,
-        embedding_model: str = "/Users/yuweidong/.cache/huggingface/hub/models--sentence-transformers--all-MiniLM-L6-v2/snapshots/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/",
+        embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
         collection_name: str = "beam_book",
     ):
         """Initialize the vector store.
@@ -51,8 +75,16 @@ class VectorStore:
             metadata={"description": "BEAM book knowledge base"},
         )
 
-        # Initialize embedding model
-        self.embedding_model = SentenceTransformer(embedding_model)
+        # Initialize embedding model - try to use cached version first
+        cached_path = get_cached_model_path(embedding_model)
+        if cached_path:
+            # Use cached model to avoid network calls
+            self.embedding_model = SentenceTransformer(
+                cached_path, local_files_only=True
+            )
+        else:
+            # Fall back to downloading (will use default cache location)
+            self.embedding_model = SentenceTransformer(embedding_model)
 
     def add_documents(self, chunks: List[DocumentChunk]) -> int:
         """Add document chunks to the vector store.
