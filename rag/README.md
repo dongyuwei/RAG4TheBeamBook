@@ -155,13 +155,20 @@ rag/
 ├── pyproject.toml              # Project configuration
 ├── README.md                   # This file
 ├── vector_db/                  # ChromaDB storage (created on first run)
-└── src/
-    └── beam_rag/
-        ├── __init__.py         # Package initialization
-        ├── document_processor.py   # Document parsing and chunking
-        ├── vector_store.py         # ChromaDB and embeddings
-        ├── rag_agent.py            # Pydantic AI agent
-        └── cli.py                  # Command-line interface
+├── src/
+│   └── beam_rag/
+│       ├── __init__.py         # Package initialization
+│       ├── document_processor.py   # Document parsing and chunking
+│       ├── vector_store.py         # ChromaDB and embeddings
+│       ├── rag_agent.py            # Pydantic AI agent
+│       └── cli.py                  # Command-line interface
+└── tests/                      # Unit tests
+    ├── __init__.py
+    ├── conftest.py
+    ├── test_document_processor.py
+    ├── test_vector_store.py
+    ├── test_rag_agent.py
+    └── test_cli.py
 ```
 
 ## Example Output
@@ -205,9 +212,71 @@ Sources:
 
 ### Running Tests
 
+The project includes comprehensive unit tests covering all modules:
+
 ```bash
+# Run all tests
 uv run pytest
+
+# Run with verbose output
+uv run pytest -v
+
+# Run specific test file
+uv run pytest tests/test_document_processor.py
+uv run pytest tests/test_vector_store.py
+uv run pytest tests/test_rag_agent.py
+uv run pytest tests/test_cli.py
+
+# Run with coverage report
+uv run pytest --cov=beam_rag --cov-report=html
 ```
+
+#### Test Structure
+
+```
+tests/
+├── __init__.py                 # Test package initialization
+├── conftest.py                 # Pytest configuration and fixtures
+├── test_document_processor.py  # Tests for DocumentChunk and DocumentProcessor
+├── test_vector_store.py        # Tests for VectorStore and embeddings
+├── test_rag_agent.py           # Tests for RAGResponse and RAGAgent (async)
+└── test_cli.py                 # Tests for CLI commands
+```
+
+#### Test Coverage (45 tests total)
+
+**Document Processor Tests (13 tests)**
+- DocumentChunk dataclass creation and defaults
+- DocumentProcessor initialization (default and custom paths)
+- AsciiDoc content cleaning (bold, italic, includes, etc.)
+- Text chunking (short and long text)
+- Code chunking (Erlang, C, Python)
+- Processing asciidoc and code files
+- File discovery
+
+**Vector Store Tests (12 tests)**
+- Cached model path retrieval
+- VectorStore initialization (default and with cached model)
+- Document ID generation
+- Document addition (empty list, duplicates)
+- Search functionality (with and without results)
+- Collection statistics
+- Collection clearing
+
+**RAG Agent Tests (10 tests)**
+- RAGResponse model creation and validation
+- RAGAgent initialization (default, custom params, Anthropic)
+- Async querying (no context, with context, multiple results)
+- Context building (with and without sections)
+- Statistics retrieval
+
+**CLI Tests (11 tests)**
+- Help and version commands
+- Index command
+- Stats command
+- Clear command (confirm and cancel)
+- Ask command (with API key, no API key, no documents)
+- Command options
 
 ### Code Quality
 
