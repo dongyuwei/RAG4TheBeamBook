@@ -148,6 +148,84 @@ User Question
 Structured Response (answer + sources + confidence)
 ```
 
+### Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      INDEXING WORKFLOW                          │
+└─────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐
+    │  BEAM Book Files │
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐
+    │ DocumentProcessor│
+    │                  │
+    │ • Parse asciidoc │
+    │ • Extract code   │
+    │ • Chunk content  │
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐     ┌──────────────────┐
+    │  DocumentChunk   │────▶│  VectorStore     │
+    │  Objects         │     │                  │
+    └────────┬─────────┘     │ • Embed (MiniLM) │
+             │               │ • Store (Chroma) │
+             │               └────────┬─────────┘
+             │                        │
+             │               ┌────────▼─────────┐
+             │               │   vector_db/     │
+             │               │  (persistent     │
+             │               │   storage)       │
+             │               └──────────────────┘
+             │
+             ▼
+    ┌───────────────────────────────────────────────────────────┐
+│                      QUERY WORKFLOW                           │
+└───────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐
+    │  User Question   │
+    │  "What is BEAM?" │
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐
+    │  CLI Command     │
+    │  beam-rag ask    │
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐     ┌──────────────────┐
+    │   RAGAgent       │────▶│  VectorStore     │
+    │                  │     │                  │
+    │ • Embed query    │     │ • Search similar │
+    │ • Retrieve docs  │◀────│ - Return top-k   │
+    │                  │     └──────────────────┘
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐     ┌──────────────────┐
+    │ Pydantic AI      │────▶│  LLM (GPT-4o)    │
+    │                  │     │                  │
+    │ • Build context  │     │ • Generate       │
+    │ • Run agent      │◀────│   answer         │
+    └────────┬─────────┘     └──────────────────┘
+             │
+    ┌────────▼─────────┐
+    │  RAGResponse     │
+    │                  │
+    │ • answer         │
+    │ • sources        │
+    │ • confidence     │
+    └────────┬─────────┘
+             │
+    ┌────────▼─────────┐
+    │  CLI Display     │
+    │                  │
+    │ • Rich panels    │
+    │ • Source list    │
+    └──────────────────┘
+```
+
 ## Project Structure
 
 ```
