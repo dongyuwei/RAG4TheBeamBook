@@ -8,7 +8,7 @@ from typing import List, Dict, Any
 
 import chromadb
 from chromadb.config import Settings
-from huggingface_hub import snapshot_download, hf_hub_download
+from huggingface_hub import snapshot_download
 from sentence_transformers import SentenceTransformer
 
 from beam_rag.document_processor import DocumentChunk
